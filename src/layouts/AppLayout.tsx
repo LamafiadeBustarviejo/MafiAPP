@@ -1,4 +1,4 @@
-import { Outlet, Navigate } from 'react-router-dom'
+import { Outlet, Navigate, Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { membersService } from '@/services/members'
@@ -83,14 +83,15 @@ export function AppLayout() {
           
           <nav className="flex-1 px-3 py-3 md:py-6 space-y-0.5 md:space-y-1 overflow-y-auto">
             {navigation.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 className="flex items-center gap-3 px-3 py-2 md:py-2 text-zinc-400 rounded-md hover:bg-zinc-800 hover:text-white transition-colors"
+                onClick={() => setSidebarOpen(false)}
               >
                 <item.icon className="w-4 h-4 md:w-5 md:h-5" />
                 <span className="text-sm md:text-base">{item.name}</span>
-              </a>
+              </Link>
             ))}
           </nav>
 
