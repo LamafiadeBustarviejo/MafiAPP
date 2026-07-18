@@ -173,6 +173,10 @@ export function AppLayout() {
           <div className="bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl p-8 max-w-md w-full text-center space-y-5 animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
             <h3 className="text-2xl font-bold text-emerald-400">Aplicación diseñada por Charly.</h3>
             
+            <div className="flex justify-center py-2">
+              <img src="/creator.png" alt="Charly" className="w-32 h-32 md:w-40 md:h-40 object-cover rounded-2xl shadow-[0_0_20px_rgba(52,211,153,0.3)] border-2 border-zinc-800" />
+            </div>
+            
             <div className="space-y-3 py-4">
               <p className="text-zinc-300 text-lg">Si estas agradecido, díselo.</p>
               <p className="text-red-400 font-bold text-lg">Si te está molestando.... ¡ANDA PALLÁ!</p>
