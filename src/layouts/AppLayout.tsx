@@ -77,26 +77,26 @@ export function AppLayout() {
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="h-full flex flex-col">
-          <div className="h-20 md:h-28 w-full flex items-center justify-center border-b border-zinc-800 overflow-hidden shrink-0 bg-zinc-950/50">
-            <img src="/logo.png" alt="La MafiAPP" className="w-4/5 h-4/5 object-contain mix-blend-screen" />
+          <div className="h-28 md:h-36 w-full flex items-center justify-center border-b border-zinc-800 overflow-hidden shrink-0 bg-zinc-950/50">
+            <img src="/logo.png" alt="La MafiAPP" className="w-11/12 h-11/12 object-contain mix-blend-screen" />
           </div>
           
-          <nav className="flex-1 px-3 py-3 md:py-6 space-y-0.5 md:space-y-1 overflow-y-auto">
+          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className="flex items-center gap-3 px-3 py-2 md:py-2 text-zinc-400 rounded-md hover:bg-zinc-800 hover:text-white transition-colors"
+                className="flex items-center gap-4 px-4 py-3 text-zinc-400 rounded-lg hover:bg-zinc-800 hover:text-white transition-colors"
                 onClick={() => setSidebarOpen(false)}
               >
-                <item.icon className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="text-sm md:text-base">{item.name}</span>
+                <item.icon className="w-6 h-6 shrink-0" />
+                <span className="text-base md:text-lg font-medium">{item.name}</span>
               </Link>
             ))}
           </nav>
 
-          <div className="p-3 md:p-4 border-t border-zinc-800 shrink-0">
-            <div className="flex justify-center items-center gap-4 py-1 mb-2 md:mb-3 w-full">
+          <div className="p-4 md:p-6 border-t border-zinc-800 shrink-0">
+            <div className="flex justify-center items-center gap-6 py-2 mb-4 w-full">
               <a 
                 href="https://chat.whatsapp.com/CG6SOYOYuYT99mEf13qQX6?s=sw&p=a&ilr=1" 
                 target="_blank" 
@@ -104,7 +104,7 @@ export function AppLayout() {
                 className="hover:scale-105 transition-transform cursor-pointer"
                 title="Chat de la Peña"
               >
-                <img src="/whatsapp-mafia.png" alt="Chat de la Peña" className="h-10 md:h-12 w-auto object-contain drop-shadow-[0_0_15px_rgba(34,197,94,0.3)]" />
+                <img src="/whatsapp-mafia.png" alt="Chat de la Peña" className="h-14 md:h-16 w-auto object-contain drop-shadow-[0_0_15px_rgba(34,197,94,0.3)]" />
               </a>
               {isAdmin && (
                 <a 
@@ -114,16 +114,16 @@ export function AppLayout() {
                   className="hover:scale-105 transition-transform cursor-pointer"
                   title="Chat de la Cúpula"
                 >
-                  <img src="/whatsapp-cupula.jpg" alt="Chat de la Cúpula" className="h-10 md:h-12 w-auto object-contain drop-shadow-[0_0_15px_rgba(217,119,6,0.3)] rounded-full" />
+                  <img src="/whatsapp-cupula.jpg" alt="Chat de la Cúpula" className="h-14 md:h-16 w-auto object-contain drop-shadow-[0_0_15px_rgba(217,119,6,0.3)] rounded-full" />
                 </a>
               )}
             </div>
             
             <button 
               onClick={handleLogout}
-              className="flex items-center justify-center gap-2 px-3 py-2 w-full text-zinc-400 rounded-md hover:bg-zinc-800 hover:text-red-400 transition-colors text-sm"
+              className="flex items-center justify-center gap-3 px-4 py-3 w-full text-zinc-400 rounded-lg hover:bg-zinc-800 hover:text-red-400 transition-colors text-base font-medium mt-2"
             >
-              <LogOut className="w-4 h-4 md:w-5 md:h-5" />
+              <LogOut className="w-5 h-5" />
               <span>Cerrar sesión</span>
             </button>
           </div>
