@@ -270,7 +270,7 @@ export function FinanceForm() {
                 value={watch('event') || ''} 
                 onValueChange={(v) => setValue('event', v)}
               >
-                <SelectTrigger className="bg-zinc-950 border-zinc-800 h-12">
+                <SelectTrigger className="bg-zinc-950 border-zinc-800 h-12 text-zinc-100">
                   <SelectValue placeholder="Ninguno / General" />
                 </SelectTrigger>
                 <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
@@ -315,7 +315,7 @@ export function FinanceForm() {
                       value={otherMemberId} 
                       onValueChange={setOtherMemberId}
                     >
-                      <SelectTrigger className="bg-zinc-950 border-zinc-800 h-12">
+                      <SelectTrigger className="bg-zinc-950 border-zinc-800 h-12 text-zinc-100">
                         <SelectValue placeholder="Selecciona el miembro..." />
                       </SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-zinc-800 text-white max-h-64">
@@ -337,7 +337,7 @@ export function FinanceForm() {
                     value={watch('member_id')} 
                     onValueChange={(v) => setValue('member_id', v)}
                   >
-                    <SelectTrigger className="bg-zinc-950 border-zinc-800 h-12">
+                    <SelectTrigger className="bg-zinc-950 border-zinc-800 h-12 text-zinc-100">
                       <SelectValue placeholder="Selecciona el miembro..." />
                     </SelectTrigger>
                     <SelectContent className="bg-zinc-900 border-zinc-800 text-white max-h-64">
