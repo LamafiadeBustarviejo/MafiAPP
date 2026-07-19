@@ -118,9 +118,14 @@ export function AddMemberModal({ onClose }: AddMemberModalProps) {
               className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-white placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500 text-sm"
             >
               <option value="">Selecciona un rol...</option>
-              {roles?.map(role => (
-                <option key={role.id} value={role.id}>{role.name}</option>
-              ))}
+              {roles?.map(role => {
+                const displayName = role.name.toLowerCase() === 'admin' 
+                  ? 'Administrador' 
+                  : role.name.toLowerCase() === 'member' 
+                    ? 'Miembro' 
+                    : role.name
+                return <option key={role.id} value={role.id}>{displayName}</option>
+              })}
             </select>
           </div>
         </div>
