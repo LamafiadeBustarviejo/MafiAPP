@@ -67,7 +67,7 @@ export function AppLayout() {
     { name: 'Mi Situación', icon: Home, href: '/' },
     { name: 'Inventario', icon: Package, href: '/inventory' },
     { name: 'Tareas', icon: CheckSquare, href: '/tasks' },
-    { name: 'Finanzas', icon: DollarSign, href: '/finances' },
+    { name: 'Cuentas claras', icon: DollarSign, href: '/finances' },
     { name: 'Nuestros eventos', icon: Calendar, href: '/events' },
     { name: 'Tablón de fiestas', icon: ImageIcon, href: '/posters' },
     { name: 'Miembros', icon: Users, href: '/members' },
