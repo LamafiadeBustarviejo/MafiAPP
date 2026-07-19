@@ -31,15 +31,6 @@ export function FinanceDetail() {
     enabled: !!id
   })
 
-  if (isLoading) return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-zinc-500" /></div>
-  if (!movement) return <div className="p-12 text-center text-zinc-500">Movimiento no encontrado</div>
-
-  const isIncome = movement.type === 'income' || movement.type === 'fee'
-  const isFee = movement.type === 'fee'
-  
-  const isAdmin = currentMember?.role?.name === 'admin' || currentMember?.roles?.name === 'admin' || user?.email === 'soyelcharly@gmail.com'
-  const canEdit = isAdmin || user?.id === movement.created_by
-
   const cancelMutation = useMutation({
     mutationFn: () => financesService.cancelMovement(id!, user!.id),
     onSuccess: () => {
@@ -49,6 +40,15 @@ export function FinanceDetail() {
       queryClient.invalidateQueries({ queryKey: ['member-balance'] })
     }
   })
+
+  if (isLoading) return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-zinc-500" /></div>
+  if (!movement) return <div className="p-12 text-center text-zinc-500">Movimiento no encontrado</div>
+
+  const isIncome = movement.type === 'income' || movement.type === 'fee'
+  const isFee = movement.type === 'fee'
+  
+  const isAdmin = currentMember?.role?.name === 'admin' || currentMember?.roles?.name === 'admin' || user?.email === 'soyelcharly@gmail.com'
+  const canEdit = isAdmin || user?.id === movement.created_by
 
   const handleCancel = () => {
     if (window.confirm('¿Estás seguro de que quieres anular este movimiento? Quedará tachado y el importe no contabilizará, pero el registro se mantendrá.')) {
