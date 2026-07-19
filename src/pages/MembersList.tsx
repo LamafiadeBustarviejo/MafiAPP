@@ -3,15 +3,25 @@ import { useQuery } from '@tanstack/react-query'
 import { membersService } from '@/services/members'
 import { MemberCard } from '@/features/members/MemberCard'
 import { MemberDetail } from '@/features/members/MemberDetail'
+import { AddMemberModal } from '@/features/members/AddMemberModal'
+import { useAuth } from '@/hooks/useAuth'
 import { useDebounce } from '@/hooks/useDebounce'
 import { Input } from '@/components/ui/input'
-import { Search, Loader2, Users } from 'lucide-react'
+import { Search, Loader2, Users, UserPlus } from 'lucide-react'
 import type { Member } from '@/types'
 
 export function MembersList() {
+  const { session } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearch = useDebounce(searchTerm, 300)
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null)
+  const [showAddModal, setShowAddModal] = useState(false)
+
+  const { data: currentMember } = useQuery({
+    queryKey: ['currentMember', session?.user.id],
+    queryFn: () => membersService.getCurrentMember(session!.user.id),
+    enabled: !!session?.user.id
+  })
 
   const { data: members, isLoading, error } = useQuery({
     queryKey: ['members-full'],
@@ -44,14 +54,26 @@ export function MembersList() {
           <p className="text-sm text-zinc-400">Gestiona los integrantes y roles de la peña.</p>
         </div>
         
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-          <Input 
-            placeholder="Buscar por nombre, email, tlf..." 
-            className="pl-9 bg-zinc-900/50 border-zinc-800"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+            <Input 
+              placeholder="Buscar por nombre, email, tlf..." 
+              className="pl-9 bg-zinc-900/50 border-zinc-800"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          {(currentMember?.role?.name === 'admin' || currentMember?.roles?.name === 'admin' || session?.user?.email === 'soyelcharly@gmail.com') && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600/90 hover:bg-red-600 text-white font-medium rounded-lg transition-colors border border-red-500 shadow-lg shadow-red-900/20"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Añadir Miembro</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -105,6 +127,8 @@ export function MembersList() {
           )}
         </div>
       </div>
+
+      {showAddModal && <AddMemberModal onClose={() => setShowAddModal(false)} />}
     </div>
   )
 }
