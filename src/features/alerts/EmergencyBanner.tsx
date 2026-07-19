@@ -39,6 +39,38 @@ export function EmergencyBanner({ isAdmin, currentMemberId }: EmergencyBannerPro
           if (payload.eventType === 'INSERT' && payload.new.status === 'active') {
             setPlayAlarm(true)
             setTimeout(() => setPlayAlarm(false), 5000) // Parar después de 5s
+
+            // Try to trigger local notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+              try {
+                // Si hay Service Worker activo, es mejor usarlo para que vibre en móviles
+                if (navigator.serviceWorker) {
+                  navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification("🚨 EMERGENCIA EN LA PEÑA 🚨", {
+                      body: "¡Alguien ha pulsado el botón SOS! Pulsa para ver.",
+                      icon: "/logo.png",
+                      vibrate: [500, 250, 500, 250, 500],
+                      requireInteraction: true,
+                      tag: 'sos-alert'
+                    });
+                  }).catch(() => {
+                    new Notification("🚨 EMERGENCIA EN LA PEÑA 🚨", {
+                      body: "¡Alguien ha pulsado el botón SOS!",
+                      icon: "/logo.png",
+                      requireInteraction: true
+                    });
+                  });
+                } else {
+                  new Notification("🚨 EMERGENCIA EN LA PEÑA 🚨", {
+                    body: "¡Alguien ha pulsado el botón SOS!",
+                    icon: "/logo.png",
+                    requireInteraction: true
+                  });
+                }
+              } catch(e) {
+                console.error("Error showing notification", e);
+              }
+            }
           }
         }
       )

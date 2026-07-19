@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { membersService } from '@/services/members'
 import { Menu, LogOut, Home, Package, CheckSquare, DollarSign, Users, History, Bell, AlertTriangle, Calendar, Image as ImageIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { NotificationsMenu } from '@/features/alerts/NotificationsMenu'
 import { EmergencyBanner } from '@/features/alerts/EmergencyBanner'
@@ -16,6 +16,25 @@ export function AppLayout() {
   const [showSOSModal, setShowSOSModal] = useState(false)
   const [sosMessage, setSosMessage] = useState('')
   const queryClient = useQueryClient()
+
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
+
+  useEffect(() => {
+    if ('Notification' in window) {
+      setNotificationPermission(Notification.permission)
+    }
+  }, [])
+
+  const requestNotificationPermission = async () => {
+    if (!('Notification' in window)) return
+    const permission = await Notification.requestPermission()
+    setNotificationPermission(permission)
+    if (permission === 'granted') {
+      alert("¡Notificaciones activadas! Ahora tu móvil vibrará y te avisará cuando haya un SOS, incluso con la app minimizada.")
+    } else {
+      alert("Has bloqueado las notificaciones. No recibirás avisos si no estás mirando la app.")
+    }
+  }
 
   const { data: member, isLoading: isLoadingMember } = useQuery({
     queryKey: ['currentMember', session?.user.id],
@@ -151,6 +170,26 @@ export function AppLayout() {
           </div>
           
           <div className="flex items-center gap-4">
+            {notificationPermission === 'default' && (
+              <button 
+                onClick={requestNotificationPermission}
+                className="hidden md:flex items-center gap-2 text-xs bg-emerald-900/50 text-emerald-400 border border-emerald-800 px-3 py-1.5 rounded-full hover:bg-emerald-900 transition-colors"
+              >
+                <Bell className="w-3.5 h-3.5 animate-pulse" />
+                Activar alertas
+              </button>
+            )}
+            {notificationPermission === 'default' && (
+              <button 
+                onClick={requestNotificationPermission}
+                className="md:hidden text-emerald-400 p-2 relative"
+                title="Activar Alertas"
+              >
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1.5 right-2 w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+              </button>
+            )}
+
             <NotificationsMenu />
             <button 
               onClick={() => setShowCharlyPopup(true)}
