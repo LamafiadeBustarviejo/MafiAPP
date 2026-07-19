@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card'
 import type { Member } from '@/types'
-import { Crown, Shield, Mail, Phone, Calendar, UserX } from 'lucide-react'
+import { Crown, Shield, Mail, Phone, Calendar, UserX, MessageCircle } from 'lucide-react'
 
 interface MemberCardProps {
   member: Member
@@ -55,10 +55,16 @@ export function MemberCard({ member, isSelected, onClick }: MemberCardProps) {
         {/* Mobile secondary info */}
         <div className="md:hidden flex flex-col items-end shrink-0 text-[10px] text-zinc-500 gap-1">
           {member.profile?.phone && (
-            <a href={`tel:${member.profile.phone.replace(/\s+/g, '')}`} onClick={e => e.stopPropagation()} className="flex items-center gap-1 bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded-md transition-colors text-zinc-300">
-              <Phone className="h-3 w-3" />
-              Llamar
-            </a>
+            <div className="flex flex-col gap-1">
+              <a href={`tel:${member.profile.phone.replace(/\s+/g, '')}`} onClick={e => e.stopPropagation()} className="flex items-center justify-center gap-1 bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded-md transition-colors text-zinc-300">
+                <Phone className="h-3 w-3" />
+                Llamar
+              </a>
+              <a href={`https://wa.me/34${member.profile.phone.replace(/\s+/g, '')}`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="flex items-center justify-center gap-1 bg-[#128C7E]/20 hover:bg-[#128C7E]/40 text-[#25D366] px-2 py-1 rounded-md transition-colors">
+                <MessageCircle className="h-3 w-3" />
+                WhatsApp
+              </a>
+            </div>
           )}
         </div>
       </div>

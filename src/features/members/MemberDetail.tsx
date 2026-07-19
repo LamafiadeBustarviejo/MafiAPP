@@ -5,7 +5,7 @@ import { financesService } from '@/services/finances'
 import { useAuth } from '@/hooks/useAuth'
 import type { Member } from '@/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, Box, CheckCircle2, CircleDashed, History, Wallet, Crown, Mail, Phone, Edit2 } from 'lucide-react'
+import { Loader2, Box, CheckCircle2, CircleDashed, History, Wallet, Crown, Mail, Phone, Edit2, MessageCircle } from 'lucide-react'
 import { MemberForm } from './MemberForm'
 
 interface MemberDetailProps {
@@ -79,18 +79,32 @@ export function MemberDetail({ member }: MemberDetailProps) {
                 </p>
               </div>
               
-              <div className="flex flex-col gap-2 text-sm text-zinc-300">
-                <div className="flex items-center gap-2 justify-center md:justify-start">
-                  <Mail className="w-4 h-4 text-zinc-500" />
-                  {member.profile?.email || '-'}
-                </div>
-                {member.profile?.phone && (
+                <div className="flex flex-col gap-2 text-sm text-zinc-300">
                   <div className="flex items-center gap-2 justify-center md:justify-start">
-                    <Phone className="w-4 h-4 text-zinc-500" />
-                    {member.profile.phone}
+                    <Mail className="w-4 h-4 text-zinc-500" />
+                    {member.profile?.email || '-'}
                   </div>
-                )}
-              </div>
+                  {member.profile?.phone && (
+                    <div className="flex flex-col md:flex-row gap-3 mt-2 justify-center md:justify-start">
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-zinc-500" />
+                        {member.profile.phone}
+                      </div>
+                      
+                      {/* Botones de acción rápida */}
+                      <div className="flex items-center gap-2 justify-center">
+                        <a href={`tel:${member.profile.phone.replace(/\s+/g, '')}`} className="flex items-center gap-1 bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded-md transition-colors text-zinc-300 text-xs">
+                          <Phone className="h-3 w-3" />
+                          Llamar
+                        </a>
+                        <a href={`https://wa.me/34${member.profile.phone.replace(/\s+/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 bg-[#128C7E]/20 hover:bg-[#128C7E]/40 text-[#25D366] px-3 py-1.5 rounded-md transition-colors text-xs font-medium">
+                          <MessageCircle className="h-3 w-3" />
+                          WhatsApp
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
             </div>
             
             {canEdit && (
