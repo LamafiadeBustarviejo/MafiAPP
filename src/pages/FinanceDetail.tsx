@@ -1,15 +1,23 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { financesService } from '@/services/finances'
+import { membersService } from '@/services/members'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, Loader2, ArrowUpRight, ArrowDownRight, Banknote, Calendar, Tag, FileText, User, Receipt, History } from 'lucide-react'
+import { ArrowLeft, Loader2, ArrowUpRight, ArrowDownRight, Banknote, Calendar, Tag, FileText, User, Receipt, History, Ban } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
 export function FinanceDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const queryClient = useQueryClient()
+
+  const { data: currentMember } = useQuery({
+    queryKey: ['currentMember', user?.id],
+    queryFn: () => membersService.getCurrentMember(user!.id),
+    enabled: !!user?.id
+  })
   
   const { data: movement, isLoading } = useQuery({
     queryKey: ['finance', id],
@@ -28,7 +36,25 @@ export function FinanceDetail() {
 
   const isIncome = movement.type === 'income' || movement.type === 'fee'
   const isFee = movement.type === 'fee'
-  const canEdit = user?.role === 'admin' || user?.id === movement.created_by
+  
+  const isAdmin = currentMember?.role?.name === 'admin' || currentMember?.roles?.name === 'admin' || user?.email === 'soyelcharly@gmail.com'
+  const canEdit = isAdmin || user?.id === movement.created_by
+
+  const cancelMutation = useMutation({
+    mutationFn: () => financesService.cancelMovement(id!, user!.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['finance', id] })
+      queryClient.invalidateQueries({ queryKey: ['finance-history', id] })
+      queryClient.invalidateQueries({ queryKey: ['finances'] })
+      queryClient.invalidateQueries({ queryKey: ['member-balance'] })
+    }
+  })
+
+  const handleCancel = () => {
+    if (window.confirm('¿Estás seguro de que quieres anular este movimiento? Quedará tachado y el importe no contabilizará, pero el registro se mantendrá.')) {
+      cancelMutation.mutate()
+    }
+  }
 
   return (
     <div className="p-4 max-w-4xl mx-auto pb-20">
@@ -85,11 +111,19 @@ export function FinanceDetail() {
           <CardHeader className="border-b border-zinc-800/50">
             <CardTitle className="text-lg flex items-center justify-between">
               <span className="flex items-center gap-2"><FileText className="w-5 h-5 text-zinc-400" /> Detalles del Movimiento</span>
-              {canEdit && movement.status !== 'cancelled' && (
-                <Button size="sm" variant="outline" className="h-7 text-xs border-zinc-700 bg-zinc-800 hover:bg-zinc-700 hover:text-white" onClick={() => navigate(`/finances/${movement.id}/edit`)}>
-                  Editar
-                </Button>
-              )}
+              <div className="flex gap-2">
+                {canEdit && movement.status !== 'cancelled' && (
+                  <Button size="sm" variant="outline" className="h-7 text-xs border-zinc-700 bg-zinc-800 hover:bg-zinc-700 hover:text-white" onClick={() => navigate(`/finances/${movement.id}/edit`)}>
+                    Editar
+                  </Button>
+                )}
+                {isAdmin && movement.status !== 'cancelled' && (
+                  <Button size="sm" variant="outline" className="h-7 text-xs border-red-900/50 bg-red-950/20 text-red-500 hover:bg-red-900/50 hover:text-red-400" onClick={handleCancel} disabled={cancelMutation.isPending}>
+                    {cancelMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Ban className="w-3 h-3 mr-1" />}
+                    Anular
+                  </Button>
+                )}
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">

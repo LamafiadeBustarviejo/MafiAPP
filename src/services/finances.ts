@@ -150,5 +150,25 @@ export const financesService = {
 
     if (error) throw error
     return data as FinanceMovement[]
+  },
+
+  // Cancel movement
+  async cancelMovement(id: string, currentMemberId: string) {
+    const { error } = await supabase
+      .from('financial_movements')
+      .update({ status: 'cancelled' })
+      .eq('id', id)
+      
+    if (error) throw error
+
+    // Añadir registro de historial
+    await supabase.from('history').insert({
+      action: 'Anuló el movimiento',
+      entity_type: 'financial_movement',
+      entity_id: id,
+      performed_by: currentMemberId
+    })
+
+    return true
   }
 }
