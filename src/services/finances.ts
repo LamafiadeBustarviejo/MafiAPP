@@ -137,5 +137,18 @@ export const financesService = {
     })
 
     return balance
+  },
+
+  // Obtener la lista de gastos realizados por un miembro
+  async getMemberExpenses(memberId: string) {
+    const { data, error } = await supabase
+      .from('financial_movements')
+      .select('*')
+      .eq('member_id', memberId)
+      .eq('type', 'expense')
+      .order('date', { ascending: false })
+
+    if (error) throw error
+    return data as FinanceMovement[]
   }
 }

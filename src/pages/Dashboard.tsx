@@ -38,6 +38,13 @@ export function Dashboard() {
     enabled: !!member
   })
 
+  // 5. Fetch member expenses
+  const { data: expenses, isLoading: isLoadingExpenses } = useQuery({
+    queryKey: ['memberExpenses', member?.id],
+    queryFn: () => financesService.getMemberExpenses(member!.id),
+    enabled: !!member
+  })
+
   if (isLoadingMember) {
     return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-zinc-500" /></div>
   }
@@ -144,6 +151,38 @@ export function Dashboard() {
                     Has adelantado dinero de tu bolsillo que la peña te tiene que devolver.
                   </p>
                 )}
+                
+                {/* LISTADO DE GASTOS */}
+                <div className="mt-5 pt-4 border-t border-zinc-800">
+                  <p className="text-sm font-medium text-zinc-300 mb-4 flex items-center">
+                    <Package className="w-4 h-4 mr-2 text-zinc-400" />
+                    Mis Gastos Registrados
+                  </p>
+                  
+                  {!expenses || expenses.length === 0 ? (
+                    <div className="py-4 text-center text-zinc-500 bg-zinc-950/30 rounded-lg border border-zinc-800/50">
+                      <p className="text-xs">Aún no has registrado ningún gasto.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {expenses.map((expense) => (
+                        <div key={expense.id} className="flex justify-between items-center p-3 bg-zinc-950/50 rounded-lg border border-zinc-800/50">
+                          <div>
+                            <p className="text-zinc-200 text-sm font-medium">{expense.concept}</p>
+                            <p className="text-xs text-zinc-500 mt-1">
+                              {new Date(expense.date).toLocaleDateString('es-ES', { 
+                                day: '2-digit', month: 'short', year: 'numeric' 
+                              })}
+                            </p>
+                          </div>
+                          <span className="font-bold text-orange-400">
+                            {Number(expense.amount).toFixed(2)} €
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
