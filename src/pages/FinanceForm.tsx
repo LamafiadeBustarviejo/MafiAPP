@@ -160,7 +160,7 @@ export function FinanceForm() {
     }
   })
 
-  if (isEditing && loadingMovement) return <div className="flex justify-center p-12"><Loader2 className="animate-spin text-zinc-500" /></div>
+  if (loadingMembers || (isEditing && loadingMovement)) return <div className="flex justify-center p-12"><Loader2 className="animate-spin text-zinc-500" /></div>
   
   const currentMemberInfo = members?.find(m => m.profile_id === user?.id)
   const isAdmin = currentMemberInfo?.role?.name === 'admin' || currentMemberInfo?.roles?.name === 'admin' || user?.email === 'soyelcharly@gmail.com'
