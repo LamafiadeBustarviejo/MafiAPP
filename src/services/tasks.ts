@@ -98,5 +98,16 @@ export const tasksService = {
       
     if (error) throw error
     return data as TaskComment
+  },
+
+  // Eliminar un comentario
+  async deleteComment(id: string) {
+    const { error } = await supabase
+      .from('task_comments')
+      .delete()
+      .eq('id', id)
+      
+    if (error) throw error
+    return true
   }
 }

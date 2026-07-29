@@ -67,6 +67,14 @@ export function TaskDetail() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['task-comments', id] })
   })
 
+  const deleteCommentMutation = useMutation({
+    mutationFn: (commentId: string) => tasksService.deleteComment(commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['task-comments', id] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] }) // Update comments count
+    }
+  })
+
   // Auto-scroll comments removido para que no baje del todo
   // useEffect(() => {
   //   commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -179,7 +187,13 @@ export function TaskDetail() {
                     key={comment.id}
                     comment={comment} 
                     isOwnComment={comment.author?.profile_id === session?.user.id}
+                    isAdmin={isAdmin}
                     onEdit={(id, content) => editCommentMutation.mutate({ id, content })}
+                    onDelete={(id) => {
+                      if (window.confirm('¿Seguro que quieres borrar este comentario?')) {
+                        deleteCommentMutation.mutate(id)
+                      }
+                    }}
                   />
                 ))
               )}

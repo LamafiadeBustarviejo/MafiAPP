@@ -1,15 +1,17 @@
 import type { TaskComment } from '@/types'
 import { useState } from 'react'
-import { Edit2, Save, X } from 'lucide-react'
+import { Edit2, Save, X, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface CommentBubbleProps {
   comment: TaskComment
   isOwnComment: boolean
+  isAdmin?: boolean
   onEdit: (id: string, newContent: string) => void
+  onDelete?: (id: string) => void
 }
 
-export function CommentBubble({ comment, isOwnComment, onEdit }: CommentBubbleProps) {
+export function CommentBubble({ comment, isOwnComment, isAdmin, onEdit, onDelete }: CommentBubbleProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState(comment.content)
 
@@ -61,14 +63,27 @@ export function CommentBubble({ comment, isOwnComment, onEdit }: CommentBubblePr
         ) : (
           <>
             <p className="whitespace-pre-wrap">{comment.content}</p>
-            {isOwnComment && (
-              <button 
-                onClick={() => setIsEditing(true)}
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 bg-zinc-900 rounded-md text-zinc-400 hover:text-white"
-                title="Editar comentario"
-              >
-                <Edit2 className="w-3 h-3" />
-              </button>
+            {(isOwnComment || isAdmin) && (
+              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-zinc-900 rounded-md p-0.5 shadow-lg border border-zinc-800">
+                {isOwnComment && (
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    className="p-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded"
+                    title="Editar comentario"
+                  >
+                    <Edit2 className="w-3 h-3" />
+                  </button>
+                )}
+                {onDelete && (
+                  <button 
+                    onClick={() => onDelete(comment.id)}
+                    className="p-1 text-zinc-400 hover:text-red-400 hover:bg-zinc-800 rounded"
+                    title="Borrar comentario"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
             )}
           </>
         )}
