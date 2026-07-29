@@ -47,11 +47,14 @@ export function TaskDetail() {
   })
 
   const addCommentMutation = useMutation({
-    mutationFn: (content: string) => tasksService.addComment({
-      task_id: id!,
-      author_id: session!.user.id,
-      content
-    }),
+    mutationFn: (content: string) => {
+      if (!currentMember) throw new Error("Miembro no encontrado")
+      return tasksService.addComment({
+        task_id: id!,
+        author_id: currentMember.id,
+        content
+      })
+    },
     onSuccess: () => {
       setNewComment('')
       queryClient.invalidateQueries({ queryKey: ['task-comments', id] })
@@ -75,7 +78,7 @@ export function TaskDetail() {
   const isOverdue = task.due_date && new Date(task.due_date) < new Date() && !['completed', 'cancelled', 'archived'].includes(task.status)
   
   const isAdmin = currentMember?.role?.name === 'admin' || currentMember?.roles?.name === 'admin' || session?.user?.email === 'soyelcharly@gmail.com'
-  const canEdit = session?.user.id === task.created_by || session?.user.id === task.assignee?.profile_id || isAdmin
+  const canEdit = currentMember?.id === task.created_by || currentMember?.id === task.assignee_id || isAdmin
 
   return (
     <div className="p-4 max-w-4xl mx-auto space-y-4">
@@ -202,7 +205,7 @@ export function TaskDetail() {
                   type="submit" 
                   size="icon" 
                   className="rounded-full bg-red-800 hover:bg-red-700 shrink-0"
-                  disabled={!newComment.trim() || addCommentMutation.isPending}
+                  disabled={!newComment.trim() || addCommentMutation.isPending || !currentMember}
                 >
                   <Send className="h-4 w-4" />
                 </Button>
