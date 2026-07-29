@@ -131,61 +131,23 @@ export function Dashboard() {
           </Card>
 
           {/* TESORERIA */}
-          <Card className={`border ${(balance || 0) > 0 ? 'bg-orange-950/20 border-orange-900/50' : 'bg-zinc-900 border-zinc-800'}`}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium text-zinc-200 flex justify-between items-center">
-                Tesorería (Saldo con la peña)
-                <DollarSign className={`w-5 h-5 ${(balance || 0) > 0 ? 'text-orange-500' : 'text-zinc-500'}`} />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <div className="text-sm font-medium text-zinc-400 mb-1">
-                  {(balance || 0) > 0 ? 'La peña te debe:' : 'Cuentas al día'}
+          {(balance || 0) > 0 && (
+            <Card className="border bg-orange-950/20 border-orange-900/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-medium text-zinc-200 flex justify-between items-center">
+                  Tesorería (Saldo con la peña)
+                  <DollarSign className="w-5 h-5 text-orange-500" />
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col">
+                  <div className="text-2xl font-bold text-orange-500">
+                    La Mafia te debe {(balance || 0).toFixed(2)} €
+                  </div>
                 </div>
-                <div className={`text-2xl font-bold ${(balance || 0) > 0 ? 'text-orange-500' : 'text-zinc-500'}`}>
-                  {(balance || 0).toFixed(2)} €
-                </div>
-                {(balance || 0) > 0 && (
-                  <p className="text-xs text-orange-400/80 mt-2">
-                    Has adelantado dinero de tu bolsillo que la peña te tiene que devolver.
-                  </p>
-                )}
-                
-                {/* LISTADO DE GASTOS */}
-                <div className="mt-5 pt-4 border-t border-zinc-800">
-                  <p className="text-sm font-medium text-zinc-300 mb-4 flex items-center">
-                    <Package className="w-4 h-4 mr-2 text-zinc-400" />
-                    Mis Gastos Registrados
-                  </p>
-                  
-                  {!expenses || expenses.length === 0 ? (
-                    <div className="py-4 text-center text-zinc-500 bg-zinc-950/30 rounded-lg border border-zinc-800/50">
-                      <p className="text-xs">Aún no has registrado ningún gasto.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {expenses.map((expense) => (
-                        <div key={expense.id} className="flex justify-between items-center p-3 bg-zinc-950/50 rounded-lg border border-zinc-800/50">
-                          <div>
-                            <p className="text-zinc-200 text-sm font-medium">{expense.concept}</p>
-                            <p className="text-xs text-zinc-500 mt-1">
-                              {new Date(expense.date).toLocaleDateString('es-ES', { 
-                                day: '2-digit', month: 'short', year: 'numeric' 
-                              })}
-                            </p>
-                          </div>
-                          <span className="font-bold text-orange-400">
-                            {Number(expense.amount).toFixed(2)} €
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           {/* TAREAS */}
           <Card className="bg-zinc-900 border-zinc-800">
