@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CalendarEvent } from '@/services/calendar'
+import type { CalendarEvent } from '@/services/calendar'
 import { Calendar, MapPin, Clock, Music, Wine, PartyPopper, Image as ImageIcon } from 'lucide-react'
 
 interface AgendaListProps {
