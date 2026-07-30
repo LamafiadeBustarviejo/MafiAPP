@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent } from '@/components/ui/card'
-import { Loader2, Upload, X, Image as ImageIcon, Instagram } from 'lucide-react'
+import { Loader2, Upload, X, Image as ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -89,8 +89,23 @@ export function PostersBoard() {
             variant="outline"
             className="border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 text-zinc-300 gap-2"
           >
-            <a href="https://www.instagram.com/lamafiadebustarviejo/" target="_blank" rel="noopener noreferrer">
-              <Instagram className="w-4 h-4 text-pink-500" />
+            <a href="https://www.instagram.com/lamafiadebustarviejo/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+              <svg 
+                xmlns="http://www.w3.org/20w0/svg" 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className="text-pink-500"
+              >
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+              </svg>
               <span className="hidden sm:inline">Nuestro Instagram</span>
             </a>
           </Button>
