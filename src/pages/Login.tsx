@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { LogIn, Loader2 } from 'lucide-react'
+import { LogIn, Loader2, Calendar } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export function Login() {
   const [email, setEmail] = useState('')
@@ -110,6 +111,19 @@ export function Login() {
             >
               ¿Has olvidado tu contraseña?
             </button>
+            
+            <div className="w-full pt-6 mt-4 border-t border-zinc-800">
+              <Link to="/agenda" className="w-full">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  className="w-full border-red-900/50 hover:bg-red-950/30 text-red-400 hover:text-red-300 transition-colors"
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Ver Agenda de Fiestas (Público)
+                </Button>
+              </Link>
+            </div>
           </CardFooter>
         </form>
       </Card>

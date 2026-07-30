@@ -18,6 +18,7 @@ import { FinanceDetail } from '@/pages/FinanceDetail'
 import { FinanceForm } from '@/pages/FinanceForm'
 import { HistoryList } from '@/pages/HistoryList'
 import { Events } from '@/pages/Events'
+import { Agenda } from '@/pages/Agenda'
 
 const queryClient = new QueryClient()
 
@@ -29,6 +30,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/update-password" element={<UpdatePassword />} />
+            <Route path="/agenda" element={<Agenda />} />
             
             <Route element={<AppLayout />}>
               <Route path="/" element={<Dashboard />} />
