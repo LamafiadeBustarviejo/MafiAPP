@@ -23,7 +23,7 @@ export function TasksList() {
     queryFn: tasksService.getTasks
   })
 
-  // Filter tasks
+  // Filter and sort tasks
   const filteredTasks = tasks?.filter(task => {
     // Mode filter
     if (filterMode === 'mine' && session?.user && task.assignee?.profile_id !== session.user.id) return false
@@ -31,6 +31,13 @@ export function TasksList() {
     if (debouncedSearch && !task.title.toLowerCase().includes(debouncedSearch.toLowerCase()) && !task.assignee?.nickname.toLowerCase().includes(debouncedSearch.toLowerCase())) return false
     
     return true
+  }).sort((a, b) => {
+    const isADone = ['completed', 'cancelled', 'archived'].includes(a.status)
+    const isBDone = ['completed', 'cancelled', 'archived'].includes(b.status)
+    
+    if (isADone && !isBDone) return 1
+    if (!isADone && isBDone) return -1
+    return 0 // Mantener el orden original para el resto
   })
 
   if (error) {
