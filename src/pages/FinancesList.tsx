@@ -33,8 +33,8 @@ export function FinancesList() {
   if (error) return <div className="p-4 text-center text-red-500">Error al cargar: {(error as Error).message}</div>
 
   return (
-    <div className="p-4 max-w-7xl mx-auto h-[calc(100vh-4rem)] flex flex-col">
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mb-6 shrink-0">
+    <div className="p-4 max-w-7xl mx-auto space-y-6 pb-20">
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center shrink-0">
         <div>
           <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-2">
             <ArrowRightLeft className="w-6 h-6 text-emerald-500" />
@@ -62,7 +62,7 @@ export function FinancesList() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto custom-scrollbar pr-2 pb-20">
+      <div className="flex flex-col gap-6">
         {isLoading ? (
           <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-zinc-500" /></div>
         ) : !movements?.length ? (
