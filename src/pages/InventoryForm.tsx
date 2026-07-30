@@ -137,7 +137,7 @@ export function InventoryForm() {
                   className="flex h-9 w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1 text-sm text-zinc-100 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
                   <option value="">Selecciona...</option>
-                  {members?.map(m => (
+                  {members?.filter(m => m.status !== 'inactive' || m.id === item?.owner_id).map(m => (
                     <option key={m.id} value={m.id}>{m.nickname}</option>
                   ))}
                 </select>

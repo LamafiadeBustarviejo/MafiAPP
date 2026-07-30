@@ -319,7 +319,7 @@ export function FinanceForm() {
                         <SelectValue placeholder="Selecciona el miembro..." />
                       </SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-zinc-800 text-white max-h-64">
-                        {members?.map(m => <SelectItem key={m.id} value={m.id}>{m.nickname}</SelectItem>)}
+                        {members?.filter(m => m.status !== 'inactive' || m.id === movement?.member_id).map(m => <SelectItem key={m.id} value={m.id} className="text-zinc-100">{m.nickname}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
@@ -341,7 +341,7 @@ export function FinanceForm() {
                       <SelectValue placeholder="Selecciona el miembro..." />
                     </SelectTrigger>
                     <SelectContent className="bg-zinc-900 border-zinc-800 text-white max-h-64">
-                      {members?.map(m => <SelectItem key={m.id} value={m.id}>{m.nickname}</SelectItem>)}
+                      {members?.filter(m => m.status !== 'inactive' || m.id === movement?.receiver_id).map(m => <SelectItem key={m.id} value={m.id} className="text-zinc-100">{m.nickname}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 )}

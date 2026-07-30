@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { membersService } from '@/services/members'
 import { financesService } from '@/services/finances'
 import { useAuth } from '@/hooks/useAuth'
 import type { Member } from '@/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, Box, CheckCircle2, CircleDashed, History, Wallet, Crown, Mail, Phone, Edit2, MessageCircle } from 'lucide-react'
+import { Loader2, Box, CheckCircle2, CircleDashed, History, Wallet, Crown, Mail, Phone, Edit2, MessageCircle, Trash2 } from 'lucide-react'
 import { MemberForm } from './MemberForm'
 
 interface MemberDetailProps {
@@ -15,6 +15,14 @@ interface MemberDetailProps {
 export function MemberDetail({ member }: MemberDetailProps) {
   const { session } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
+  const queryClient = useQueryClient()
+  
+  const deactivateMutation = useMutation({
+    mutationFn: () => membersService.updateMember(member.id, { status: 'inactive' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['members-full'] })
+    }
+  })
   
   // Fetch current user member profile to check admin rights
   const { data: currentUserMember } = useQuery({
@@ -107,15 +115,32 @@ export function MemberDetail({ member }: MemberDetailProps) {
                 </div>
             </div>
             
-            {canEdit && (
-              <button 
-                onClick={() => setIsEditing(true)}
-                className="mt-4 md:mt-0 p-2 text-zinc-400 hover:text-emerald-400 hover:bg-emerald-400/10 rounded-md transition-colors flex items-center gap-2 text-sm shrink-0"
-              >
-                <Edit2 className="w-4 h-4" />
-                <span className="hidden md:inline">Editar</span>
-              </button>
-            )}
+            <div className="flex flex-col md:flex-row gap-2">
+              {canEdit && (
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className="mt-4 md:mt-0 p-2 text-zinc-400 hover:text-emerald-400 hover:bg-emerald-400/10 rounded-md transition-colors flex items-center gap-2 text-sm shrink-0"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  <span className="hidden md:inline">Editar</span>
+                </button>
+              )}
+              {isAdmin && member.status !== 'inactive' && member.profile?.email !== 'soyelcharly@gmail.com' && (
+                <button 
+                  onClick={() => {
+                    if (window.confirm('¿Seguro que quieres dar de baja a este miembro? Dejará de aparecer en las listas activas, pero mantendrá su historial financiero y de tareas.')) {
+                      deactivateMutation.mutate()
+                    }
+                  }}
+                  disabled={deactivateMutation.isPending}
+                  className="mt-4 md:mt-0 p-2 text-zinc-400 hover:text-red-400 hover:bg-red-400/10 rounded-md transition-colors flex items-center gap-2 text-sm shrink-0"
+                  title="Dar de baja"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span className="hidden md:inline">Dar de baja</span>
+                </button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

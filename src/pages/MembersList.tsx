@@ -30,6 +30,8 @@ export function MembersList() {
 
   // Filter members
   const filteredMembers = members?.filter(member => {
+    if (member.status === 'inactive') return false
+    
     if (!debouncedSearch) return true
     const s = debouncedSearch.toLowerCase()
     return (
