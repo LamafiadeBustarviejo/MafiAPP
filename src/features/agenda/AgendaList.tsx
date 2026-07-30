@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import type { CalendarEvent } from '@/services/calendar'
-import { Calendar, MapPin, Clock, Music, Wine, PartyPopper, Image as ImageIcon, MessageCircle, Send, User, ChevronDown, ChevronUp } from 'lucide-react'
+import { Calendar, MapPin, Clock, Music, Wine, PartyPopper, Image as ImageIcon, MessageCircle, Send, User, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
 import { agendaCommentsService } from '@/services/agendaComments'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/hooks/useAuth'
+import { membersService } from '@/services/members'
+import type { Member } from '@/types'
 
 interface AgendaListProps {
   events: CalendarEvent[]
@@ -69,6 +71,13 @@ export function AgendaList({ events }: AgendaListProps) {
   const groupedPast = groupEvents(pastEvents)
 
   const [showPast, setShowPast] = useState(false)
+  const { session } = useAuth()
+  
+  const { data: currentMember } = useQuery({
+    queryKey: ['currentMember', session?.user?.id],
+    queryFn: () => membersService.getCurrentMember(session!.user.id),
+    enabled: !!session?.user
+  })
 
   return (
     <div className="space-y-10">
@@ -97,7 +106,7 @@ export function AgendaList({ events }: AgendaListProps) {
               // Extraer enlace a imagen adjunta si la hay
               const firstAttachment = event.attachments && event.attachments.length > 0 ? event.attachments[0] : null;
 
-              return <EventCard key={event.id} event={event} now={now} />
+              return <EventCard key={event.id} event={event} now={now} currentMember={currentMember} />
             })}
           </div>
         </div>
@@ -123,7 +132,7 @@ export function AgendaList({ events }: AgendaListProps) {
                   </h2>
                   <div className="space-y-4 relative">
                     <div className="absolute left-[23px] top-4 bottom-4 w-px bg-gradient-to-b from-zinc-800 via-zinc-800 to-transparent" />
-                    {dayEvents.map(event => <EventCard key={event.id} event={event} now={now} />)}
+                    {dayEvents.map(event => <EventCard key={event.id} event={event} now={now} currentMember={currentMember} />)}
                   </div>
                 </div>
               ))}
@@ -135,12 +144,13 @@ export function AgendaList({ events }: AgendaListProps) {
   )
 }
 
-function EventCard({ event, now }: { event: CalendarEvent, now: Date }) {
+function EventCard({ event, now, currentMember }: { event: CalendarEvent, now: Date, currentMember?: Member }) {
   const [showComments, setShowComments] = useState(false)
   const [newComment, setNewComment] = useState('')
   const [guestName, setGuestName] = useState('')
   const { session } = useAuth()
   const queryClient = useQueryClient()
+  const isAdmin = currentMember?.role?.name === 'admin'
 
   const { data: comments, isLoading } = useQuery({
     queryKey: ['comments', event.id],
@@ -153,11 +163,20 @@ function EventCard({ event, now }: { event: CalendarEvent, now: Date }) {
 
   const addComment = useMutation({
     mutationFn: async () => {
-      const author = session?.user?.user_metadata?.nickname || guestName || 'Anónimo'
+      const author = currentMember?.nickname || guestName || 'Anónimo'
       await agendaCommentsService.createComment(event.id, author, newComment)
     },
     onSuccess: () => {
       setNewComment('')
+      queryClient.invalidateQueries({ queryKey: ['comments', event.id] })
+    }
+  })
+
+  const deleteComment = useMutation({
+    mutationFn: async (commentId: string) => {
+      await agendaCommentsService.deleteComment(commentId)
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', event.id] })
     }
   })
@@ -255,15 +274,26 @@ function EventCard({ event, now }: { event: CalendarEvent, now: Date }) {
             ) : (
               <div className="space-y-3">
                 {comments?.map(comment => (
-                  <div key={comment.id} className="bg-zinc-950/50 rounded-xl p-3 border border-zinc-800/50">
+                  <div key={comment.id} className="bg-zinc-950/50 rounded-xl p-3 border border-zinc-800/50 group relative">
                     <div className="flex items-center gap-2 mb-1">
                       <User className="w-3 h-3 text-red-500" />
                       <span className="text-xs font-bold text-zinc-300">{comment.author_name}</span>
-                      <span className="text-[10px] text-zinc-600 ml-auto">
+                      <span className="text-[10px] text-zinc-600 ml-auto mr-6">
                         {new Date(comment.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <p className="text-sm text-zinc-400 ml-5">{comment.content}</p>
+                    <p className="text-sm text-zinc-400 ml-5 pr-8">{comment.content}</p>
+                    
+                    {isAdmin && (
+                      <button 
+                        onClick={() => deleteComment.mutate(comment.id)}
+                        disabled={deleteComment.isPending}
+                        className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity text-zinc-600 hover:text-red-500"
+                        title="Borrar comentario"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
