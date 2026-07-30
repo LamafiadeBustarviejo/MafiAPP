@@ -3,9 +3,11 @@ import { useQuery } from '@tanstack/react-query'
 import { membersService } from '@/services/members'
 import { financesService } from '@/services/finances'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertTriangle, CheckSquare, DollarSign, Loader2, ArrowRight, Package, Plus } from 'lucide-react'
+import { AlertTriangle, CheckSquare, DollarSign, Loader2, ArrowRight, Package, Plus, CheckCircle2, Calendar } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { calendarService } from '@/services/calendar'
+import { AgendaList } from '@/features/agenda/AgendaList'
 
 export function Dashboard() {
   const { user } = useAuth()
@@ -45,6 +47,13 @@ export function Dashboard() {
     enabled: !!member
   })
 
+  // 6. Fetch upcoming events
+  const { data: events, isLoading: isLoadingEvents } = useQuery({
+    queryKey: ['agenda'],
+    queryFn: calendarService.getUpcomingEvents,
+    refetchInterval: 60000 * 5 // 5 min
+  })
+
   if (isLoadingMember) {
     return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-zinc-500" /></div>
   }
@@ -69,7 +78,15 @@ export function Dashboard() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Mi Situación</h1>
-          <p className="text-zinc-400">Resumen personal de {member.nickname}.</p>
+          <div className="text-zinc-400 flex items-center gap-2">
+            Resumen personal de {member.nickname}
+            {feePayment && (
+              <CheckCircle2 className="w-5 h-5 text-emerald-500" title="Cuota pagada" />
+            )}
+          </div>
+          {tasks?.length === 0 && (
+             <p className="text-emerald-400 text-sm mt-1">¡Gracias! Hiciste todas las tareas.</p>
+          )}
         </div>
         
         <div className="flex flex-wrap gap-2">
@@ -99,22 +116,16 @@ export function Dashboard() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          {/* CUOTA */}
-          <Card className={`border ${feePayment ? 'bg-emerald-950/20 border-emerald-900/50' : 'bg-red-950/20 border-red-900/50'}`}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium text-zinc-200 flex justify-between items-center">
-                Estado de la Cuota
-                <DollarSign className={`w-5 h-5 ${feePayment ? 'text-emerald-500' : 'text-red-500'}`} />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {feePayment ? (
-                <div>
-                  <div className="text-2xl font-bold text-emerald-400 mb-2">¡Pagada!</div>
-                  <p className="text-sm text-emerald-500/80">Estás al corriente de pago.</p>
-                  <p className="text-xs text-zinc-500 mt-4">Último registro: {new Date(feePayment.date).toLocaleDateString()}</p>
-                </div>
-              ) : (
+          {/* CUOTA (Solo si está pendiente) */}
+          {!feePayment && (
+            <Card className="border bg-red-950/20 border-red-900/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-medium text-zinc-200 flex justify-between items-center">
+                  Estado de la Cuota
+                  <DollarSign className="w-5 h-5 text-red-500" />
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div>
                   <div className="text-2xl font-bold text-red-400 mb-2">Pendiente</div>
                   <p className="text-sm text-red-400/80">Aún no consta tu pago de la cuota anual (60€).</p>
@@ -126,9 +137,9 @@ export function Dashboard() {
                     </Link>
                   </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           {/* TESORERIA */}
           {(balance || 0) > 0 && (
@@ -149,47 +160,55 @@ export function Dashboard() {
             </Card>
           )}
 
-          {/* TAREAS */}
-          <Card className="bg-zinc-900 border-zinc-800">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium text-zinc-200 flex justify-between items-center">
-                Mis Tareas Pendientes
-                <CheckSquare className="w-5 h-5 text-indigo-400" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!tasks || tasks.length === 0 ? (
-                <div className="py-6 text-center text-zinc-500">
-                  <CheckSquare className="w-8 h-8 text-zinc-800 mx-auto mb-2" />
-                  <p className="text-sm">No tienes ninguna tarea asignada.</p>
-                </div>
-              ) : (
-                <div className="space-y-3 mt-2">
-                  <div className="text-sm text-indigo-400 font-medium mb-4">Tienes {tasks.length} tarea(s) pendiente(s)</div>
+          {/* TAREAS (Solo si tiene tareas pendientes) */}
+          {tasks && tasks.length > 0 && (
+            <Card className="bg-zinc-900 border-zinc-800">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-medium text-zinc-200 flex justify-between items-center">
+                  Mis Tareas Pendientes
+                  <CheckSquare className="w-5 h-5 text-indigo-400" />
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
                   {tasks.map(task => (
-                    <Link key={task.id} to={`/tasks/${task.id}`}>
-                      <div className="p-3 bg-zinc-950 border border-zinc-800 rounded-lg hover:border-zinc-700 transition-colors group cursor-pointer flex justify-between items-center">
-                        <div className="truncate pr-4">
-                          <h3 className="font-medium text-zinc-100 truncate text-sm group-hover:text-indigo-400 transition-colors">{task.title}</h3>
-                          {task.due_date && (
-                            <p className="text-xs text-zinc-500 mt-1">Límite: {new Date(task.due_date).toLocaleDateString()}</p>
-                          )}
+                    <div key={task.id} className="p-3 bg-zinc-950 rounded-lg border border-zinc-800">
+                      <div className="font-medium text-zinc-200">{task.title}</div>
+                      <div className="flex justify-between items-center mt-2">
+                        <div className="text-sm text-zinc-500">
+                          Estado: <span className="text-indigo-400">{task.status}</span>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-indigo-400 shrink-0" />
+                        <Link to={`/tasks/${task.id}`}>
+                          <Button size="sm" variant="ghost" className="text-zinc-400 hover:text-white h-8">
+                            Ver <ArrowRight className="w-3 h-3 ml-1" />
+                          </Button>
+                        </Link>
                       </div>
-                    </Link>
+                    </div>
                   ))}
-                  <div className="pt-2">
-                    <Link to="/tasks" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
-                      Ver todo el panel de tareas &rarr;
-                    </Link>
-                  </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
+
+      {/* AGENDA OFICIAL */}
+      <div className="mt-12 pt-12 border-t border-zinc-800">
+        <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+          <Calendar className="w-6 h-6 text-red-500" />
+          Agenda Oficial
+        </h2>
+        {isLoadingEvents ? (
+          <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-zinc-500" /></div>
+        ) : events && events.length > 0 ? (
+          <AgendaList events={events} />
+        ) : (
+          <div className="text-center p-12 border border-dashed border-zinc-800 rounded-xl text-zinc-500">
+            No hay próximos eventos programados.
+          </div>
+        )}
+      </div>
     </div>
   )
 }

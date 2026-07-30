@@ -11,6 +11,11 @@ export interface CalendarEvent {
     dateTime?: string;
     date?: string;
   };
+  attachments?: {
+    fileUrl: string;
+    title: string;
+    iconLink?: string;
+  }[];
 }
 
 const CALENDAR_ID = import.meta.env.VITE_GOOGLE_CALENDAR_ID;
@@ -26,7 +31,7 @@ export const calendarService = {
     today.setHours(0, 0, 0, 0);
     const timeMin = today.toISOString();
 
-    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&singleEvents=true&orderBy=startTime&timeMin=${timeMin}`;
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&singleEvents=true&orderBy=startTime&timeMin=${timeMin}&supportsAttachments=true`;
     
     const response = await fetch(url);
     if (!response.ok) {
