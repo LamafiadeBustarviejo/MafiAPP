@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent } from '@/components/ui/card'
-import { Loader2, Upload, X, Image as ImageIcon } from 'lucide-react'
+import { Loader2, Upload, X, Image as ImageIcon, Instagram } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -83,7 +83,18 @@ export function PostersBoard() {
           <p className="text-zinc-400">Pósters y carteles de otras peñas y eventos para ir calentando motores.</p>
         </div>
         
-        <div>
+        <div className="flex gap-2">
+          <Button 
+            asChild 
+            variant="outline"
+            className="border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 text-zinc-300 gap-2"
+          >
+            <a href="https://www.instagram.com/lamafiadebustarviejo/" target="_blank" rel="noopener noreferrer">
+              <Instagram className="w-4 h-4 text-pink-500" />
+              <span className="hidden sm:inline">Nuestro Instagram</span>
+            </a>
+          </Button>
+
           <input
             type="file"
             id="poster-upload"
