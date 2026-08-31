@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { calendarService } from '@/services/calendar'
 import { AgendaList } from '@/features/agenda/AgendaList'
+import { PollWidget } from '@/features/polls/PollWidget'
 
 export function Dashboard() {
   const { user } = useAuth()
@@ -159,6 +160,9 @@ export function Dashboard() {
               </CardContent>
             </Card>
           )}
+
+          {/* Widget de Encuestas */}
+          <PollWidget />
 
           {/* TAREAS (Solo si tiene tareas pendientes) */}
           {tasks && tasks.length > 0 && (

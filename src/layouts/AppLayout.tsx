@@ -2,7 +2,7 @@ import { Outlet, Navigate, Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { membersService } from '@/services/members'
-import { Menu, LogOut, Home, Package, CheckSquare, DollarSign, Users, History, Bell, AlertTriangle, Calendar, Image as ImageIcon } from 'lucide-react'
+import { Menu, LogOut, Home, Package, CheckSquare, DollarSign, Users, History, Bell, AlertTriangle, Calendar, Image as ImageIcon, PieChart } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { NotificationsMenu } from '@/features/alerts/NotificationsMenu'
@@ -70,6 +70,7 @@ export function AppLayout() {
     { name: 'Cuentas claras', icon: DollarSign, href: '/finances' },
     { name: 'Nuestros eventos', icon: Calendar, href: '/events' },
     { name: 'Tablón de fiestas', icon: ImageIcon, href: '/posters' },
+    { name: 'Encuestas', icon: PieChart, href: '/polls' },
     { name: 'Miembros', icon: Users, href: '/members' },
   ]
 

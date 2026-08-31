@@ -8,7 +8,7 @@ import { TaskStatusBadge, TaskPriorityBadge } from '@/features/tasks/TaskBadges'
 import { CommentBubble } from '@/features/tasks/CommentBubble'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, ArrowLeft, Edit2, CalendarClock, Send, User2, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Loader2, ArrowLeft, Edit2, CalendarClock, Send, User2, AlertTriangle, CheckCircle2, Paperclip } from 'lucide-react'
 import type { TaskStatus } from '@/types'
 
 export function TaskDetail() {
@@ -132,9 +132,29 @@ export function TaskDetail() {
               </div>
 
               {task.description && (
-                <div className="pt-4 border-t border-zinc-800/50 space-y-1">
-                  <div className="text-zinc-400 mb-1">Descripción</div>
-                  <p className="text-zinc-300 whitespace-pre-wrap">{task.description}</p>
+                <div className="bg-zinc-950 rounded-xl p-4 border border-zinc-800">
+                  <p className="text-zinc-300 whitespace-pre-wrap text-sm">{task.description}</p>
+                </div>
+              )}
+
+              {task.attachment_url && (
+                <div className="bg-zinc-950 rounded-xl p-4 border border-zinc-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center shrink-0">
+                      <Paperclip className="w-5 h-5 text-indigo-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-zinc-200">Archivo Adjunto</p>
+                      <a 
+                        href={task.attachment_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-xs text-indigo-400 hover:text-indigo-300 underline"
+                      >
+                        {task.attachment_name || 'Descargar archivo'}
+                      </a>
+                    </div>
+                  </div>
                 </div>
               )}
             </CardContent>

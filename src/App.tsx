@@ -12,6 +12,7 @@ import { TasksList } from '@/pages/TasksList'
 import { TaskDetail } from '@/pages/TaskDetail'
 import { TaskForm } from '@/pages/TaskForm'
 import { PostersBoard } from '@/pages/PostersBoard'
+import { PollsList } from '@/pages/PollsList'
 import { MembersList } from '@/pages/MembersList'
 import { FinancesList } from '@/pages/FinancesList'
 import { FinanceDetail } from '@/pages/FinanceDetail'
@@ -55,6 +56,7 @@ function App() {
               <Route path="/events" element={<Events />} />
               {/* Posters Route */}
               <Route path="/posters" element={<PostersBoard />} />
+              <Route path="/polls" element={<PollsList />} />
               {/* History Route (Protected internally) */}
               <Route path="/history" element={<HistoryList />} />
             </Route>

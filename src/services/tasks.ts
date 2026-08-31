@@ -109,5 +109,26 @@ export const tasksService = {
       
     if (error) throw error
     return true
+  },
+
+  // Subir archivo adjunto a tarea
+  async uploadTaskAttachment(file: File) {
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`
+    
+    const { error: uploadError } = await supabase.storage
+      .from('task_attachments')
+      .upload(fileName, file)
+
+    if (uploadError) throw uploadError
+
+    const { data } = supabase.storage
+      .from('task_attachments')
+      .getPublicUrl(fileName)
+
+    return {
+      url: data.publicUrl,
+      name: file.name
+    }
   }
 }

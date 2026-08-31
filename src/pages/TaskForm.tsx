@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { tasksService } from '@/services/tasks'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, ArrowLeft, Save } from 'lucide-react'
+import { Loader2, ArrowLeft, Save, Paperclip } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -42,6 +42,8 @@ export function TaskForm() {
     queryFn: () => tasksService.getTask(id!),
     enabled: isEditing
   })
+  
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const { data: currentMember } = useQuery({
     queryKey: ['currentMember', session?.user.id],
     queryFn: () => membersService.getCurrentMember(session!.user.id),
@@ -76,11 +78,22 @@ export function TaskForm() {
   // Mutation
   const saveMutation = useMutation({
     mutationFn: async (data: FormData) => {
+      let attachmentUrl = task?.attachment_url || null
+      let attachmentName = task?.attachment_name || null
+
+      if (selectedFile) {
+        const uploadResult = await tasksService.uploadTaskAttachment(selectedFile)
+        attachmentUrl = uploadResult.url
+        attachmentName = uploadResult.name
+      }
+
       // Clean empty dates
       const payload = {
         ...data,
         due_date: data.due_date || null,
-        event: data.event || null
+        event: data.event || null,
+        attachment_url: attachmentUrl,
+        attachment_name: attachmentName
       }
       if (isEditing) {
         return tasksService.updateTask(id!, payload)
@@ -202,8 +215,45 @@ export function TaskForm() {
               />
             </div>
 
-            <div className="pt-4 flex justify-end">
-              <Button type="submit" disabled={saveMutation.isPending} className="bg-red-800 hover:bg-red-700 text-white">
+            <div className="space-y-2">
+              <Label>Archivo Adjunto (Opcional)</Label>
+              <div className="flex items-center gap-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="bg-zinc-950 border-zinc-800 text-zinc-300"
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                >
+                  <Paperclip className="w-4 h-4 mr-2" />
+                  Seleccionar Archivo
+                </Button>
+                <input 
+                  id="file-upload" 
+                  type="file" 
+                  className="hidden" 
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setSelectedFile(e.target.files[0])
+                    }
+                  }}
+                />
+                <div className="text-sm text-zinc-400">
+                  {selectedFile ? (
+                    <span className="text-emerald-400 font-medium">{selectedFile.name}</span>
+                  ) : task?.attachment_name ? (
+                    <span>Archivo actual: <span className="text-indigo-400">{task.attachment_name}</span></span>
+                  ) : (
+                    <span>Ningún archivo seleccionado</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-zinc-800 flex justify-end gap-3">
+              <Button type="button" variant="ghost" onClick={() => navigate(-1)} className="text-zinc-400">
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={saveMutation.isPending} className="bg-indigo-600 hover:bg-indigo-700">
                 {saveMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                 Guardar Tarea
               </Button>
