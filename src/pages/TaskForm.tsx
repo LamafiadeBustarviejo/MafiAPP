@@ -51,7 +51,7 @@ export function TaskForm() {
   })
 
   // Form
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       priority: 'medium',
@@ -60,6 +60,32 @@ export function TaskForm() {
       description: ''
     }
   })
+
+  const [mentionQuery, setMentionQuery] = useState<{ query: string, start: number, end: number } | null>(null)
+
+  const { ref: descRef, onChange: descOnChange, ...descRest } = register('description')
+  
+  const handleDescChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    descOnChange(e)
+    const val = e.target.value
+    const cursor = e.target.selectionStart || 0
+    const textBefore = val.slice(0, cursor)
+    const match = textBefore.match(/@(\w*)$/)
+    if (match) {
+      setMentionQuery({ query: match[1], start: match.index!, end: cursor })
+    } else {
+      setMentionQuery(null)
+    }
+  }
+
+  const handleMentionSelect = (nickname: string) => {
+    if (!mentionQuery) return
+    const currentVal = watch('description') || ''
+    const before = currentVal.slice(0, mentionQuery.start)
+    const after = currentVal.slice(mentionQuery.end)
+    setValue('description', `${before}@${nickname} ${after}`, { shouldDirty: true })
+    setMentionQuery(null)
+  }
 
   useEffect(() => {
     if (task) {
@@ -205,14 +231,36 @@ export function TaskForm() {
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 relative">
               <Label htmlFor="description">Descripción detallada</Label>
               <textarea 
                 id="description" 
-                {...register('description')} 
+                ref={descRef}
+                onChange={handleDescChange}
+                {...descRest}
                 className="flex min-h-[100px] w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500" 
                 placeholder="Detalles sobre lo que hay que hacer..."
               />
+              {mentionQuery && members && (
+                <div className="absolute top-[80px] left-0 mt-1 bg-zinc-800 border border-zinc-700 rounded-md shadow-xl overflow-hidden z-50 min-w-[200px] max-h-48 overflow-y-auto">
+                  {members.filter(m => m.nickname.toLowerCase().startsWith(mentionQuery.query.toLowerCase())).map(m => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      className="w-full text-left px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700 focus:bg-zinc-700 outline-none"
+                      onClick={() => handleMentionSelect(m.nickname)}
+                    >
+                      <span className="font-semibold text-indigo-400">@</span>{m.nickname}
+                    </button>
+                  ))}
+                  {members.filter(m => m.nickname.toLowerCase().startsWith(mentionQuery.query.toLowerCase())).length === 0 && (
+                    <div className="px-4 py-2 text-sm text-zinc-500">Ningún miembro encontrado</div>
+                  )}
+                </div>
+              )}
+              <p className="text-xs text-indigo-400 mt-1">
+                💡 Tip: Menciona a alguien escribiendo <strong>@nickname</strong> (ej. @chankete) para asignarle también esta tarea.
+              </p>
             </div>
 
             <div className="space-y-2">

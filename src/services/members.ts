@@ -115,18 +115,32 @@ export const membersService = {
     return data as Profile
   },
 
-  // Obtener las tareas pendientes de un miembro
-  async getMemberTasks(memberId: string) {
-    const { data, error } = await supabase
+  // Obtener las tareas pendientes de un miembro (asignadas directamente o mencionado con @nickname)
+  async getMemberTasks(memberId: string, memberNickname?: string) {
+    let nickname = memberNickname;
+    if (!nickname) {
+      const { data: memberData } = await supabase.from('members').select('nickname').eq('id', memberId).single();
+      nickname = memberData?.nickname;
+    }
+
+    const { data: tasks, error } = await supabase
       .from('tasks')
-      .select('*')
-      .eq('assignee_id', memberId)
+      .select('*, comments:task_comments(content)')
       .neq('status', 'completed')
       .neq('status', 'cancelled')
       .order('due_date', { ascending: true })
       
     if (error) throw error
-    return data as Task[]
+    if (!tasks) return []
+
+    const searchMention = nickname ? `@${nickname.toLowerCase()}` : null;
+
+    return tasks.filter(task => {
+      if (task.assignee_id === memberId) return true;
+      if (searchMention && task.description && task.description.toLowerCase().includes(searchMention)) return true;
+      if (searchMention && task.comments && task.comments.some((c: any) => c.content.toLowerCase().includes(searchMention))) return true;
+      return false;
+    }) as Task[]
   },
 
   // Obtener los artículos asignados a un miembro

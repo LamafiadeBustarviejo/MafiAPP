@@ -1,0 +1,1 @@
+ALTER TABLE financial_movements DROP CONSTRAINT IF EXISTS financial_movements_type_check; ALTER TABLE financial_movements ADD CONSTRAINT financial_movements_type_check CHECK (type IN ('income', 'expense', 'fee', 'compensation'));

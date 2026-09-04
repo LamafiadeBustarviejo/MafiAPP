@@ -9,10 +9,10 @@ export const resetService = {
    */
   async resetNewYear() {
     try {
-      // 1. Reset tasks: set status to 'pending', assignee_id to null
+      // 1. Reset tasks: set status to 'pending', keep assignee
       const { error: tasksError } = await supabase
         .from('tasks')
-        .update({ status: 'pending', assignee_id: null })
+        .update({ status: 'pending' })
         .neq('status', 'placeholder_to_update_all_rows') // A dummy condition to allow bulk update
 
       if (tasksError) throw new Error(`Error resetting tasks: ${tasksError.message}`)

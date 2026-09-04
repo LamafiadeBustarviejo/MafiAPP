@@ -174,3 +174,32 @@ export interface EmergencyAlert {
   reporter?: Member
   resolver?: Member
 }
+
+// ---------------------------
+// SUGGESTIONS MODULE
+// ---------------------------
+
+export interface Suggestion {
+  id: string
+  title: string
+  description: string
+  is_anonymous: boolean
+  created_by: string
+  created_at: string
+  
+  // Relations
+  creator?: Member
+  comments_count?: [{ count: number }]
+}
+
+export interface SuggestionComment {
+  id: string
+  suggestion_id: string
+  author_id: string
+  content: string
+  created_at: string
+  
+  // Relations
+  author?: Member
+}
+

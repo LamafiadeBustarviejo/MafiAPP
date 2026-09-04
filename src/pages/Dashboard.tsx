@@ -23,7 +23,7 @@ export function Dashboard() {
   // 2. Fetch tasks assigned to current member
   const { data: tasks, isLoading: isLoadingTasks } = useQuery({
     queryKey: ['memberTasks', member?.id],
-    queryFn: () => membersService.getMemberTasks(member!.id),
+    queryFn: () => membersService.getMemberTasks(member!.id, member!.nickname),
     enabled: !!member
   })
   
@@ -153,9 +153,14 @@ export function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col">
-                  <div className="text-2xl font-bold text-orange-500">
+                  <div className="text-2xl font-bold text-orange-500 mb-4">
                     La Mafia te debe {(balance || 0).toFixed(2)} €
                   </div>
+                  <Link to={`/finances/new?type=compensation&amount=${balance}&member_id=${member.id}`}>
+                    <Button size="sm" variant="outline" className="w-full border-orange-900/50 text-orange-400 hover:bg-orange-950 hover:text-orange-300">
+                      Marcar como pagado por la Mafia <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

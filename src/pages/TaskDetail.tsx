@@ -75,6 +75,32 @@ export function TaskDetail() {
     }
   })
 
+  const [mentionQuery, setMentionQuery] = useState<{ query: string, start: number, end: number } | null>(null)
+
+  const { data: members } = useQuery({ queryKey: ['members'], queryFn: membersService.getMembers })
+
+  const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    setNewComment(val)
+    
+    const cursor = e.target.selectionStart || 0
+    const textBefore = val.slice(0, cursor)
+    const match = textBefore.match(/@(\w*)$/)
+    if (match) {
+      setMentionQuery({ query: match[1], start: match.index!, end: cursor })
+    } else {
+      setMentionQuery(null)
+    }
+  }
+
+  const handleMentionSelect = (nickname: string) => {
+    if (!mentionQuery) return
+    const before = newComment.slice(0, mentionQuery.start)
+    const after = newComment.slice(mentionQuery.end)
+    setNewComment(`${before}@${nickname} ${after}`)
+    setMentionQuery(null)
+  }
+
   // Auto-scroll comments removido para que no baje del todo
   // useEffect(() => {
   //   commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -219,7 +245,24 @@ export function TaskDetail() {
               )}
               <div ref={commentsEndRef} />
             </CardContent>
-            <div className="p-3 bg-zinc-900 border-t border-zinc-800 flex-none">
+            <div className="p-3 bg-zinc-900 border-t border-zinc-800 flex-none flex flex-col gap-1 relative">
+              {mentionQuery && members && (
+                <div className="absolute bottom-full left-0 mb-2 bg-zinc-800 border border-zinc-700 rounded-md shadow-xl overflow-hidden z-50 min-w-[200px] max-h-48 overflow-y-auto">
+                  {members.filter(m => m.nickname.toLowerCase().startsWith(mentionQuery.query.toLowerCase())).map(m => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      className="w-full text-left px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700 focus:bg-zinc-700 outline-none"
+                      onClick={() => handleMentionSelect(m.nickname)}
+                    >
+                      <span className="font-semibold text-indigo-400">@</span>{m.nickname}
+                    </button>
+                  ))}
+                  {members.filter(m => m.nickname.toLowerCase().startsWith(mentionQuery.query.toLowerCase())).length === 0 && (
+                    <div className="px-4 py-2 text-sm text-zinc-500">Ningún miembro encontrado</div>
+                  )}
+                </div>
+              )}
               <form 
                 className="flex gap-2"
                 onSubmit={(e) => {
@@ -232,8 +275,9 @@ export function TaskDetail() {
                   placeholder="Escribe un comentario..."
                   className="flex-1 bg-zinc-950 border border-zinc-700 rounded-full px-4 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500"
                   value={newComment}
-                  onChange={e => setNewComment(e.target.value)}
+                  onChange={handleCommentChange}
                   disabled={addCommentMutation.isPending}
+                  autoComplete="off"
                 />
                 <Button 
                   type="submit" 
@@ -244,6 +288,9 @@ export function TaskDetail() {
                   <Send className="h-4 w-4" />
                 </Button>
               </form>
+              <div className="text-center">
+                <span className="text-[10px] text-indigo-400">💡 Tip: Escribe <strong>@</strong> para buscar y mencionar a una persona.</span>
+              </div>
             </div>
           </Card>
         </div>

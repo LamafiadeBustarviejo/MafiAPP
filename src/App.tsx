@@ -20,6 +20,9 @@ import { FinanceForm } from '@/pages/FinanceForm'
 import { HistoryList } from '@/pages/HistoryList'
 import { Events } from '@/pages/Events'
 import { Agenda } from '@/pages/Agenda'
+import { SuggestionsList } from '@/pages/SuggestionsList'
+import { SuggestionForm } from '@/pages/SuggestionForm'
+import { SuggestionDetail } from '@/pages/SuggestionDetail'
 
 const queryClient = new QueryClient()
 
@@ -47,6 +50,10 @@ function App() {
               <Route path="/tasks/:id/edit" element={<TaskForm />} />
               {/* Members Route */}
               <Route path="/members" element={<MembersList />} />
+              {/* Suggestions Routes */}
+              <Route path="/suggestions" element={<SuggestionsList />} />
+              <Route path="/suggestions/new" element={<SuggestionForm />} />
+              <Route path="/suggestions/:id" element={<SuggestionDetail />} />
               {/* Finances Routes */}
               <Route path="/finances" element={<FinancesList />} />
               <Route path="/finances/new" element={<FinanceForm />} />
