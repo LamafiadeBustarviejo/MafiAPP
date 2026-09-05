@@ -128,6 +128,7 @@ export const membersService = {
       .select('*, comments:task_comments(content)')
       .neq('status', 'completed')
       .neq('status', 'cancelled')
+      .neq('status', 'archived')
       .order('due_date', { ascending: true })
       
     if (error) throw error

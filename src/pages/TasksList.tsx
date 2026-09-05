@@ -25,6 +25,8 @@ export function TasksList() {
 
   // Filter and sort tasks
   const filteredTasks = tasks?.filter(task => {
+    // Esconder tareas archivadas y canceladas
+    if (task.status === 'archived' || task.status === 'cancelled') return false
     // Mode filter
     if (filterMode === 'mine' && session?.user && task.assignee?.profile_id !== session.user.id) return false
     // Text search
