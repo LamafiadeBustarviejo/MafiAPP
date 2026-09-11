@@ -23,6 +23,8 @@ export function FinancesList() {
   const filteredMovements = movements?.filter(m => {
     // Ocultar los movimientos de "saldar deuda" (compensation) de la lista general
     if (m.type === 'compensation') return false
+    // Ocultar los movimientos anulados (cancelados)
+    if (m.status === 'cancelled') return false
     
     if (!debouncedSearch) return true
     const s = debouncedSearch.toLowerCase()
